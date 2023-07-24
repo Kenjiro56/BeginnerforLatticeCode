@@ -15,23 +15,34 @@ using namespace NTL;
 // 次元
 #define dimention 3
 
-/// @brief Gram-Schmidt直行化を行う関数
+/// @brief Gram-Schmidt直行化を行う関数(正規化はしてない)
 /// @param base 基底行列
 /// @param GSO_matrix グラムシュミット行列
 /// @param GSO_mu_matrix グラムシュミット係数行列
 void GramSchmidt(mat_RR base, mat_RR GSO_matrix, mat_RR GSO_mu_matrix){
-   
+  
+   transpose(base,base);
+  
    for(int i = 0;i < dimention; i++){
       GSO_matrix[i] = base[i];
+      
       for(int j = 0;j < i ;j++){
          RR product, square_bj, mu;
-
-         mul(base[i],GSO_matrix[j],product);
-         //cout << product << endl;
-         // mu = product / GSO_matrix[j] * GSO_matrix[j];
-         // GSO_mu_matrix[i][j] = mu;
-         // GSO_matrix[i] = GSO_matrix[i] - mu * GSO_matrix[j];
+         product = base[i] * GSO_matrix[j];
+         square_bj = GSO_matrix[j] * GSO_matrix[j];
+         // cout << product << endl;
+         div(mu,product,square_bj);
+         GSO_mu_matrix[i][j] = mu;
+         GSO_matrix[i] = GSO_matrix[i] - mu * GSO_matrix[j];
       }
+   }
+   transpose(GSO_matrix,GSO_matrix);
+   cout << "グラムシュミット行列" << endl;
+   for(int i=0;i<dimention;i++){
+      for(int j=0;j<dimention;j++){
+         cout << GSO_matrix[i][j]<< "\t";
+      } 
+      cout << "" << endl;  
    }
 }
 
@@ -63,8 +74,8 @@ int main()
 
    この例だと
 
-   1/√2      1/√6    -1/√3
-   1/√2     -1/√6     1/√3
+     1      1/√6    -1/√3
+     1     -1/√6     1/√3
      0       2/√6     1/√3
 
    になるはず。
@@ -85,7 +96,7 @@ int main()
    // 基底行列の確認
    // for(int i=0;i<dimention;i++){
    //    for(int j=0;j<dimention;j++){
-   //       cout << base[i][j] << " ";
+   //       cout << base[i][j] << "\t";
    //    } 
    //    cout << "" << endl;
    // }
@@ -95,14 +106,14 @@ int main()
    // cout << "グラムシュミット行列" << endl;
    // for(int i=0;i<dimention;i++){
    //    for(int j=0;j<dimention;j++){
-   //       cout << GSO_matrix [i][j]<< " ";
+   //       cout << GSO_matrix[i][j]<< "\t";
    //    } 
    //    cout << "" << endl;  
    // }
    // cout << "グラムシュミット係数行列" << endl;
    // for(int i=0;i<dimention;i++){
    //    for(int j=0;j<dimention;j++){
-   //       cout << GSO_mu_matrix [i][j]<< " ";
+   //       cout << GSO_mu_matrix[i][j]<< "\t";
    //    } 
    //    cout << "" << endl;
    // }
