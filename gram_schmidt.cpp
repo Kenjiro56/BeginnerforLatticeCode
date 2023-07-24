@@ -64,16 +64,7 @@ int main()
    // while(getline(base_file, reading_line_buffer)){
       
    // }
-   /*
-
-   この例だと
-
-     1      1/√6    -1/√3
-     1     -1/√6     1/√3
-     0       2/√6     1/√3
-
-   になるはず。
-   */ 
+  
    base[0][0] = 1;
    base[0][1] = 0;
    base[0][2] = 1;
