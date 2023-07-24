@@ -19,7 +19,7 @@ using namespace NTL;
 /// @param base 基底行列
 /// @param GSO_matrix グラムシュミット行列
 /// @param GSO_mu_matrix グラムシュミット係数行列
-void GramSchmidt(mat_RR base, mat_RR GSO_matrix, mat_RR GSO_mu_matrix){
+void GramSchmidt(mat_RR& base, mat_RR& GSO_matrix, mat_RR& GSO_mu_matrix){
   
    transpose(base,base);
   
@@ -37,13 +37,7 @@ void GramSchmidt(mat_RR base, mat_RR GSO_matrix, mat_RR GSO_mu_matrix){
       }
    }
    transpose(GSO_matrix,GSO_matrix);
-   cout << "グラムシュミット行列" << endl;
-   for(int i=0;i<dimention;i++){
-      for(int j=0;j<dimention;j++){
-         cout << GSO_matrix[i][j]<< "\t";
-      } 
-      cout << "" << endl;  
-   }
+
 }
 
 
@@ -103,20 +97,20 @@ int main()
 
    GramSchmidt(base,GSO_matrix,GSO_mu_matrix);
 
-   // cout << "グラムシュミット行列" << endl;
-   // for(int i=0;i<dimention;i++){
-   //    for(int j=0;j<dimention;j++){
-   //       cout << GSO_matrix[i][j]<< "\t";
-   //    } 
-   //    cout << "" << endl;  
-   // }
-   // cout << "グラムシュミット係数行列" << endl;
-   // for(int i=0;i<dimention;i++){
-   //    for(int j=0;j<dimention;j++){
-   //       cout << GSO_mu_matrix[i][j]<< "\t";
-   //    } 
-   //    cout << "" << endl;
-   // }
+   cout << "グラムシュミット行列" << endl;
+   for(int i=0;i<dimention;i++){
+      for(int j=0;j<dimention;j++){
+         cout << GSO_matrix[i][j]<< "\t";
+      } 
+      cout << "" << endl;  
+   }
+   cout << "グラムシュミット係数行列" << endl;
+   for(int i=0;i<dimention;i++){
+      for(int j=0;j<dimention;j++){
+         cout << GSO_mu_matrix[i][j]<< "\t";
+      } 
+      cout << "" << endl;
+   }
 
 }
 NTL_CLIENT
