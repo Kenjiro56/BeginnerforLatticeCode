@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
+#include <sys/stat.h>
 
 #include <NTL/ZZ_p.h>
 #include <NTL/vec_ZZ.h>
@@ -23,7 +23,7 @@ using namespace NTL;
 /// @param GSO_matrix グラムシュミット行列
 /// @param GSO_mu_matrix グラムシュミット係数行列
 void GramSchmidt(mat_RR& base, mat_RR& GSO_matrix, mat_RR& GSO_mu_matrix){
-  
+  transpose(base,base);
    for(int i = 0;i < dimention; i++){
       GSO_matrix[i] = base[i];
       
@@ -41,16 +41,6 @@ void GramSchmidt(mat_RR& base, mat_RR& GSO_matrix, mat_RR& GSO_mu_matrix){
 
 }
 
-vector<string> split(string& input, char delimiter){
-   istringstream stream(input);
-   string field;
-   vector<string> result;
-   while (getline(stream, field, delimiter)) {
-      result.push_back(field);
-   }
-   return result;
-}
-
 int main()
 {
    // 基底行列
@@ -66,17 +56,31 @@ int main()
    GSO_mu_matrix.SetDims(dimention,dimention);
 
    // 入力ファイル
-   ifstream ifs("d=" + to_string(dimention) +"baseMatrix.csv");
+   string base_file_path = "./BaseMatrix/d=" + to_string(dimention) + "baseMatrix.csv";
+   ifstream file(base_file_path);
    string line;
-   while (getline(ifs, line)) {
-   vector<string> strvec = split(line, ',');
-      for (int i=0; i<strvec.size();i++){
-         printf("%5d\n", stoi(strvec.at(i)));
-      }    
+
+   if(file.fail()){
+      cout << "Failed to open file." << endl;
+      return -1;
+   }else{
+      cout << "open successfully" << endl;
+   }
+
+   int col = 0;
+   while(getline(file,line)){
+      string value;
+      istringstream stream(line);
+      int row = 0;
+      while(getline(stream,value,',')){
+         base[row][col] = stoi(value);
+         row++;
+      }
+      col++;
    }
   
   /*
-  確かめるための小さな次元の既定行列*/
+  確かめるための小さな次元の既定行列
    base[0][0] = 1;
    base[0][1] = 0;
    base[0][2] = 1;
@@ -88,35 +92,59 @@ int main()
    base[2][0] = 0;
    base[2][1] = 1;
    base[2][2] = 1;
-
+   */
    transpose(base,base);
-   
-   // cout << base[0] * base[0] << endl;
 
-   // 基底行列の確認
-   for(int i=0;i<dimention;i++){
-      for(int j=0;j<dimention;j++){
-         cout << base[i][j] << "\t";
-      } 
-      cout << "" << endl;
-   }
+   // // 基底行列の確認
+   // for(int i=0;i<dimention;i++){
+   //    for(int j=0;j<dimention;j++){
+   //       cout << base[i][j] << "\t";
+   //    } 
+   //    cout << "" << endl;
+   // }
 
    GramSchmidt(base,GSO_matrix,GSO_mu_matrix);
 
-   cout << "グラムシュミット行列" << endl;
-   for(int i=0;i<dimention;i++){
-      for(int j=0;j<dimention;j++){
-         cout << GSO_matrix[i][j]<< "\t";
-      } 
-      cout << "" << endl;  
-   }
-   cout << "グラムシュミット係数行列" << endl;
-   for(int i=0;i<dimention;i++){
-      for(int j=0;j<dimention;j++){
-         cout << GSO_mu_matrix[i][j]<< "\t";
-      } 
-      cout << "" << endl;
+   // cout << "グラムシュミット行列" << endl;
+   // for(int i=0;i<dimention;i++){
+   //    for(int j=0;j<dimention;j++){
+   //       cout << GSO_matrix[i][j]<< "\t";
+   //    } 
+   //    cout << "" << endl;  
+   // }
+   // cout << "グラムシュミット係数行列" << endl;
+   // for(int i=0;i<dimention;i++){
+   //    for(int j=0;j<dimention;j++){
+   //       cout << GSO_mu_matrix[i][j]<< "\t";
+   //    } 
+   //    cout << "" << endl;
+   // }
+
+
+
+   // ファイルの出力
+   string folder_name = ("./GSOMatrix/d=" + to_string(dimention));
+   if(mkdir(folder_name.c_str(),0777) == 0){
+      cout << "ディレクトリ"<< folder_name << "を作成しました" << endl;
    }
 
+   string GSOMatrix_csv_path = folder_name +"/GSOMatrix.csv";
+   string GSOCoeff_csv_path = folder_name +"/GSOCoeff.csv";
+   ofstream Matrix_csv(GSOMatrix_csv_path);
+   ofstream Coeff_csv(GSOCoeff_csv_path);
+
+   for(int i=0;i<dimention;i++){
+      for(int j=0;j<dimention;j++){
+         if(j != 0){
+            Matrix_csv << ",";
+            Coeff_csv << ",";
+
+         }
+         Matrix_csv << GSO_matrix[i][j];
+         Coeff_csv << GSO_mu_matrix[i][j];
+      } 
+      Matrix_csv << endl;
+      Coeff_csv << endl;
+   }
 }
 NTL_CLIENT
