@@ -1,9 +1,13 @@
+// 出入力ライブラリ
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+
+// ディレクトリ作成ライブラリ
 #include <sys/stat.h>
 
+// NTLライブラリ
 #include <NTL/ZZ_p.h>
 #include <NTL/vec_ZZ.h>
 #include <NTL/vec_RR.h>
@@ -79,20 +83,6 @@ int main()
       col++;
    }
   
-  /*
-  確かめるための小さな次元の既定行列
-   base[0][0] = 1;
-   base[0][1] = 0;
-   base[0][2] = 1;
-   
-   base[1][0] = 1;
-   base[1][1] = -1;
-   base[1][2] = 1;
-
-   base[2][0] = 0;
-   base[2][1] = 1;
-   base[2][2] = 1;
-   */
    transpose(base,base);
 
    // // 基底行列の確認
@@ -128,11 +118,13 @@ int main()
       cout << "ディレクトリ"<< folder_name << "を作成しました" << endl;
    }
 
+   // 出力ファイル
    string GSOMatrix_csv_path = folder_name +"/GSOMatrix.csv";
    string GSOCoeff_csv_path = folder_name +"/GSOCoeff.csv";
    ofstream Matrix_csv(GSOMatrix_csv_path);
    ofstream Coeff_csv(GSOCoeff_csv_path);
 
+   // csv書き込み
    for(int i=0;i<dimention;i++){
       for(int j=0;j<dimention;j++){
          if(j != 0){
