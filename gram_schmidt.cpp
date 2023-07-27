@@ -28,6 +28,8 @@ using namespace NTL;
 /// @param GSO_mu_matrix グラムシュミット係数行列
 void GramSchmidt(mat_RR& base, mat_RR& GSO_matrix, mat_RR& GSO_mu_matrix){
   transpose(base,base);
+  // これが正解？
+  ident(GSO_mu_matrix,dimention);
    for(int i = 0;i < dimention; i++){
       GSO_matrix[i] = base[i];
       
@@ -35,7 +37,6 @@ void GramSchmidt(mat_RR& base, mat_RR& GSO_matrix, mat_RR& GSO_mu_matrix){
          RR product, square_bj, mu;
          product = base[i] * GSO_matrix[j];
          square_bj = GSO_matrix[j] * GSO_matrix[j];
-         // cout << product << endl;
          div(mu,product,square_bj);
          GSO_mu_matrix[i][j] = mu;
          GSO_matrix[i] = GSO_matrix[i] - mu * GSO_matrix[j];
@@ -119,8 +120,8 @@ int main()
    }
 
    // 出力ファイル
-   string GSOMatrix_csv_path = folder_name +"/GSOMatrix.csv";
-   string GSOCoeff_csv_path = folder_name +"/GSOCoeff.csv";
+   string GSOMatrix_csv_path = folder_name + "/GSOMatrix.csv";
+   string GSOCoeff_csv_path = folder_name + "/GSOCoeff.csv";
    ofstream Matrix_csv(GSOMatrix_csv_path);
    ofstream Coeff_csv(GSOCoeff_csv_path);
 
@@ -130,7 +131,6 @@ int main()
          if(j != 0){
             Matrix_csv << ",";
             Coeff_csv << ",";
-
          }
          Matrix_csv << GSO_matrix[i][j];
          Coeff_csv << GSO_mu_matrix[i][j];
