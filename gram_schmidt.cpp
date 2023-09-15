@@ -20,30 +20,32 @@ using namespace std;
 using namespace NTL;
 
 // 次元
-#define dimention 3
+#define dimension 3
 
 /// @brief Gram-Schmidt直行化を行う関数(正規化はしてない)
 /// @param base 基底行列
 /// @param GSO_matrix グラムシュミット行列
 /// @param GSO_mu_matrix グラムシュミット係数行列
-void GramSchmidt(mat_RR& base, mat_RR& GSO_matrix, mat_RR& GSO_mu_matrix){
-  transpose(base,base);
-  // これが正解？
-  ident(GSO_mu_matrix,dimention);
-   for(int i = 0;i < dimention; i++){
+void GramSchmidt(mat_RR &base, mat_RR &GSO_matrix, mat_RR &GSO_mu_matrix)
+{
+   transpose(base, base);
+
+   ident(GSO_mu_matrix, dimension);
+   for (int i = 0; i < dimension; i++)
+   {
       GSO_matrix[i] = base[i];
-      
-      for(int j = 0;j < i ;j++){
+
+      for (int j = 0; j < i; j++)
+      {
          RR product, square_bj, mu;
          product = base[i] * GSO_matrix[j];
          square_bj = GSO_matrix[j] * GSO_matrix[j];
-         div(mu,product,square_bj);
+         div(mu, product, square_bj);
          GSO_mu_matrix[i][j] = mu;
          GSO_matrix[i] = GSO_matrix[i] - mu * GSO_matrix[j];
       }
    }
-   transpose(GSO_matrix,GSO_matrix);
-
+   transpose(GSO_matrix, GSO_matrix);
 }
 
 int main()
@@ -56,67 +58,71 @@ int main()
    mat_RR GSO_mu_matrix;
 
    // 次元の設定
-   base.SetDims(dimention,dimention);
-   GSO_matrix.SetDims(dimention,dimention);
-   GSO_mu_matrix.SetDims(dimention,dimention);
+   base.SetDims(dimension, dimension);
+   GSO_matrix.SetDims(dimension, dimension);
+   GSO_mu_matrix.SetDims(dimension, dimension);
 
    // 入力ファイル
-   string base_file_path = "./BaseMatrix/d=" + to_string(dimention) + "baseMatrix.csv";
+   string base_file_path = "./BaseMatrix/d=" + to_string(dimension) + "baseMatrix.csv";
    ifstream file(base_file_path);
    string line;
 
-   if(file.fail()){
+   if (file.fail())
+   {
       cout << "Failed to open file." << endl;
       return -1;
-   }else{
+   }
+   else
+   {
       cout << "open successfully" << endl;
    }
 
    int col = 0;
-   while(getline(file,line)){
+   while (getline(file, line))
+   {
       string value;
       istringstream stream(line);
       int row = 0;
-      while(getline(stream,value,',')){
+      while (getline(stream, value, ','))
+      {
          base[row][col] = stoi(value);
          row++;
       }
       col++;
    }
-  
-   transpose(base,base);
+
+   transpose(base, base);
 
    // // 基底行列の確認
-   // for(int i=0;i<dimention;i++){
-   //    for(int j=0;j<dimention;j++){
+   // for(int i=0;i<dimension;i++){
+   //    for(int j=0;j<dimension;j++){
    //       cout << base[i][j] << "\t";
-   //    } 
+   //    }
    //    cout << "" << endl;
    // }
 
-   GramSchmidt(base,GSO_matrix,GSO_mu_matrix);
+   GramSchmidt(base, GSO_matrix, GSO_mu_matrix);
 
    // cout << "グラムシュミット行列" << endl;
-   // for(int i=0;i<dimention;i++){
-   //    for(int j=0;j<dimention;j++){
+   // for(int i=0;i<dimension;i++){
+   //    for(int j=0;j<dimension;j++){
    //       cout << GSO_matrix[i][j]<< "\t";
-   //    } 
-   //    cout << "" << endl;  
+   //    }
+   //    cout << "" << endl;
    // }
    // cout << "グラムシュミット係数行列" << endl;
-   // for(int i=0;i<dimention;i++){
-   //    for(int j=0;j<dimention;j++){
+   // for(int i=0;i<dimension;i++){
+   //    for(int j=0;j<dimension;j++){
    //       cout << GSO_mu_matrix[i][j]<< "\t";
-   //    } 
+   //    }
    //    cout << "" << endl;
    // }
 
-
-
    // ファイルの出力
-   string folder_name = ("./GSOMatrix/d=" + to_string(dimention));
-   if(mkdir(folder_name.c_str(),0777) == 0){
-      cout << "ディレクトリ"<< folder_name << "を作成しました" << endl;
+   string folder_name = ("./GSOMatrix/d=" + to_string(dimension));
+   if (mkdir(folder_name.c_str(), 0777) == 0)
+   {
+      cout << "ディレクトリ" << folder_name << "を作成しました" << endl;
    }
 
    // 出力ファイル
@@ -126,15 +132,18 @@ int main()
    ofstream Coeff_csv(GSOCoeff_csv_path);
 
    // csv書き込み
-   for(int i=0;i<dimention;i++){
-      for(int j=0;j<dimention;j++){
-         if(j != 0){
+   for (int i = 0; i < dimension; i++)
+   {
+      for (int j = 0; j < dimension; j++)
+      {
+         if (j != 0)
+         {
             Matrix_csv << ",";
             Coeff_csv << ",";
          }
          Matrix_csv << GSO_matrix[i][j];
          Coeff_csv << GSO_mu_matrix[i][j];
-      } 
+      }
       Matrix_csv << endl;
       Coeff_csv << endl;
    }
