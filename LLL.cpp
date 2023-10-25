@@ -56,8 +56,10 @@ int main()
         col++;
     }
     transpose(base, base);
+
     // 浮動小数点LLL
     LLL_FP(base);
+
     // 出力
     cout << base << endl;
 }
