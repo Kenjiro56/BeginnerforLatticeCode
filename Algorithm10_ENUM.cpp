@@ -27,14 +27,12 @@ Output :
 #include <sys/stat.h>
 
 // NTLライブラリ
-#include <NTL/ZZ_p.h>
+#include <NTL/ZZ.h>
 #include <NTL/vec_ZZ.h>
 #include <NTL/vec_RR.h>
-#include <NTL/vec_ZZ_p.h>
 #include <NTL/RR.h>
 #include <NTL/mat_ZZ.h>
 #include <NTL/mat_RR.h>
-#include <NTL/mat_ZZ_p.h>
 #include <NTL/LLL.h>
 using namespace std;
 using namespace NTL;
@@ -115,12 +113,13 @@ vec_RR ENUM(mat_RR &base, mat_RR &GSO_matrix, vec_RR &GSO_norm, vec_RR &upper_bo
     c.SetLength(dimension);
     clear(c);
 
-    // このcも何者？（今は考えられない）
+    // 重み!バッファが大きい順に深さ優先探索
     vec_RR w;
     w.SetLength(dimension);
     clear(w);
 
     // v(i) != 0 となる最大の1 <= i <= n
+
     int last_nonzero = 1;
 
     int k = 1;
@@ -239,8 +238,7 @@ int main()
     v = ENUM(base, GSO_matrix, B, upper_bound);
 
     mat_ZZ BKZ_base = conv<mat_ZZ>(base);
-    // BKZ_base.SetDims(dimension, dimension);
-    // KZ_base = base;
+
     BKZ_FP(BKZ_base, 0.99, dimension);
     for (int i = 0; i < v.length(); i++)
     {
