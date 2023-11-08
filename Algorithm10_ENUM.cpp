@@ -37,7 +37,7 @@ Output :
 using namespace std;
 using namespace NTL;
 
-#define dimension 3 // 次元数
+#define dimension 5 // 次元数
 
 /// @brief Gram-Schmidt直行化を行う関数(正規化はしてない)
 /// @param base 基底行列
@@ -73,7 +73,8 @@ void cal_upper_bound(vec_RR &upper_bound, RR epsilon, vec_RR B)
     upper_bound[dimension - 1] = epsilon * B[0];
     for (int i = dimension - 2; i >= 0; i--)
     {
-        upper_bound[i] = i * upper_bound[dimension - 1] / dimension;
+        upper_bound[i] = (i + 1) * upper_bound[dimension - 1] / dimension;
+        // cout << i << "に" << upper_bound[i] << "を入れるよ" << endl;
     }
 }
 
@@ -227,7 +228,19 @@ int main()
         }
         col++;
     }
+    // 　この時点で入力と同じ基底ベクトルになっている
     transpose(base, base);
+
+    // 配列出力
+    // for (int i = 0; i < dimension; i++)
+    // {
+    //     for (int j = 0; j < dimension; j++)
+    //     {
+    //         cout << base[i][j] << " ";
+    //     }
+    //     cout << "" << endl;
+    // }
+
     GramSchmidt(base, GSO_matrix, GSO_mu_matrix);
 
     for (int i = 0; i < dimension; i++)
@@ -235,6 +248,12 @@ int main()
         B[i] = GSO_matrix[i] * GSO_matrix[i];
     }
     cal_upper_bound(upper_bound, epsilon, B);
+
+    // 数え上げ上界がうまく計算できているか確認
+    for (int i = 0; i < dimension; i++)
+    {
+        cout << upper_bound.at(i) << endl;
+    }
     v = ENUM(base, GSO_matrix, B, upper_bound);
 
     mat_ZZ BKZ_base = conv<mat_ZZ>(base);
