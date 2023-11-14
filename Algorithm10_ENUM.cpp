@@ -37,7 +37,7 @@ Output :
 using namespace std;
 using namespace NTL;
 
-#define dimension 5 // 次元数
+#define dimension 3 // 次元数
 
 /// @brief Gram-Schmidt直行化を行う関数(正規化はしてない)
 /// @param base 基底行列
@@ -84,8 +84,21 @@ void cal_upper_bound(vec_RR &upper_bound, RR epsilon, vec_RR B)
 /// @param GSO_norm GSOベクトルの二乗ノルム
 /// @param upper_bound 数え上げ上界列
 /// @return 格子ベクトルの係数ベクトル
-vec_RR ENUM(mat_RR &base, mat_RR &GSO_matrix, vec_RR &GSO_norm, vec_RR &upper_bound)
+vec_RR ENUM(mat_RR &base, mat_RR &GSO_mu_matrix, vec_RR &GSO_norm, vec_RR &upper_bound)
 {
+    // transpose(GSO_matrix, GSO_matrix);
+    // cout << "グラムシュミット行列" << endl;
+    // cout << GSO_matrix << "\t";
+    // cout << "" << endl;
+
+    // cout << "B" << endl;
+    // cout << GSO_norm << "\t";
+    // cout << "" << endl;
+
+    // cout << "R^2" << endl;
+    // cout << upper_bound << "\t";
+    // cout << "" << endl;
+
     ///////// Initialize ////////////
     // mu,vのシグマを格納する用の多次元配列(初期値は全て0)
     mat_RR sigma;
@@ -105,7 +118,7 @@ vec_RR ENUM(mat_RR &base, mat_RR &GSO_matrix, vec_RR &GSO_norm, vec_RR &upper_bo
 
     // 格子ベクトルの係数ベクトル
     vec_RR v;
-    v.SetLength(dimension + 1);
+    v.SetLength(dimension);
     clear(v);
     v[0] = 1;
 
@@ -120,33 +133,39 @@ vec_RR ENUM(mat_RR &base, mat_RR &GSO_matrix, vec_RR &GSO_norm, vec_RR &upper_bo
     clear(w);
 
     // v(i) != 0 となる最大の1 <= i <= n
-
     int last_nonzero = 1;
 
     int k = 1;
     while (true)
     {
         RR vk_ck;
-        mul(vk_ck, sqr(v[k] - c[k]), GSO_norm[k]);
-        rho[k] = rho[k + 1] + vk_ck;
-
-        if (rho[k] <= upper_bound[dimension + 1 - k])
+        mul(vk_ck, sqr(v[k - 1] - c[k - 1]), GSO_norm[k - 1]);
+        rho[k - 1] = rho[k] + vk_ck;
+        // cout << rho[k - 1] << endl;
+        // cout << upper_bound[dimension - k] << endl;
+        // cout << "k:" << k << endl;
+        if (rho[k - 1] <= upper_bound[dimension - k])
         {
             if (k == 1)
             {
+                cout << "1:お返しします" << endl;
                 return v;
             }
             else
             {
+                cout << "2:" << endl;
                 k = k - 1;
                 r[k - 1] = max(r[k - 1], r[k]);
-                for (int i = conv<int>(r[k]) - 1; i >= k + 1; i--)
+                // cout << conv<int>(r[k - 1]) << "から " << k + 1 << "まで" << endl;
+
+                for (int i = conv<int>(r[k - 1]); i >= k + 1; i--)
                 {
-                    sigma[i][k] = sigma[i + 1][k] + GSO_matrix[i][k] * v[i];
+                    // cout << "格納してるにょん" << endl;
+                    sigma[i - 1][k - 1] = sigma[i][k - 1] + GSO_mu_matrix[i - 1][k - 1] * v[k - 1];
                 } // end for
-                c[k] = -sigma[k + 1][k];
-                v[k] = round(c[k]);
-                w[k] = 1;
+                c[k - 1] = -sigma[k][k - 1];
+                v[k - 1] = round(c[k - 1]);
+                w[k - 1] = 1;
             } //  end if
         }
         else
@@ -154,31 +173,41 @@ vec_RR ENUM(mat_RR &base, mat_RR &GSO_matrix, vec_RR &GSO_norm, vec_RR &upper_bo
             k = k + 1;
             if (k == dimension + 1)
             {
-                cout << "Not Exists" << endl;
+                cout << "3:Not Exists" << endl;
                 return v;
             } // end if
             r[k - 1] = k;
+            cout << "4:" << endl;
             if (k >= last_nonzero)
             {
                 last_nonzero = k;
-                v[k] = v[k] - 1;
+                v[k - 1] = v[k - 1] + 1;
             }
             else
             {
-                if (v[k] > c[k])
+                if (v[k - 1] > c[k - 1])
                 {
-                    v[k] = v[k] - w[k];
+                    v[k - 1] = v[k - 1] - w[k - 1];
                 }
                 else
                 {
-                    v[k] = v[k] + w[k];
+                    v[k - 1] = v[k - 1] + w[k - 1];
                 } // end if
-            }     // end if
-            w[k] = w[k] + 1;
-        } // end if
-    }     // end if
-} // end while
-
+                w[k - 1] = w[k - 1] + 1;
+            } // end if
+        }     // end if
+        cout << "k = " << k << endl;
+        cout << "sigma = " << endl;
+        cout << sigma << endl;
+        cout << "r = " << r << endl;
+        cout << "rho = " << rho << endl;
+        cout << "v = " << v << endl;
+        cout << "c = " << c << endl;
+        cout << "w = " << w << endl;
+        cout << "last_nonzero = " << last_nonzero << endl;
+        cout << "----------------------------------------" << endl;
+    } // end while
+} // end function
 int main()
 {
     // 基底行列
@@ -228,9 +257,6 @@ int main()
         }
         col++;
     }
-    // 　この時点で入力と同じ基底ベクトルになっている
-    transpose(base, base);
-
     // 配列出力
     // for (int i = 0; i < dimension; i++)
     // {
@@ -240,29 +266,61 @@ int main()
     //     }
     //     cout << "" << endl;
     // }
+    // こいつ使ってない
+    // mat_RR mu;
+    // mu.SetDims(dimension, dimension);
 
-    GramSchmidt(base, GSO_matrix, GSO_mu_matrix);
-
+    // 下の関数で代替（ntlのライブラリ）
+    // GramSchmidt(base, GSO_matrix, GSO_mu_matrix);
+    // 行列が転置するから
+    transpose(base, base);
+    ComputeGS(conv<mat_ZZ>(base), GSO_mu_matrix, B);
     for (int i = 0; i < dimension; i++)
     {
-        B[i] = GSO_matrix[i] * GSO_matrix[i];
+        for (int j = 0; j < dimension; j++)
+        {
+            if (i == j)
+            {
+                GSO_mu_matrix[i][j] = 1;
+            }
+        }
     }
+    /////// 入力パラメータの確認 //////////////////
+    cout << "------------------入力パラメータ----------------" << endl;
+    cout << "base" << endl;
+    cout << base << endl;
+    cout << "mu" << endl;
+    cout << GSO_mu_matrix << endl;
+    cout << "B" << endl;
+    cout << B << endl;
+
+    // 上の関数で代替できる
+    // for (int i = 0; i < dimension; i++)
+    // {
+    //     transpose(GSO_matrix, GSO_matrix);
+    //     //  これどっちも同じ
+    //     InnerProduct(B[i], GSO_matrix[i], GSO_matrix[i]);
+    //     // B[i] = GSO_matrix[i] * GSO_matrix[i];
+    // }
     cal_upper_bound(upper_bound, epsilon, B);
-
+    cout << "R^2" << endl;
+    cout << upper_bound << endl;
+    cout << "----------------------------------------------" << endl;
     // 数え上げ上界がうまく計算できているか確認
-    for (int i = 0; i < dimension; i++)
-    {
-        cout << upper_bound.at(i) << endl;
-    }
-    v = ENUM(base, GSO_matrix, B, upper_bound);
+    // for (int i = 0; i < dimension; i++)
+    // {
+    //     cout << upper_bound.at(i) << endl;
+    // }
+    // cout << GSO_matrix << endl;
+    // cout << B << endl;
+    // cout << upper_bound << endl;
+    v = ENUM(base, GSO_mu_matrix, B, upper_bound);
 
-    mat_ZZ BKZ_base = conv<mat_ZZ>(base);
+    // mat_ZZ BKZ_base = conv<mat_ZZ>(base);
 
-    BKZ_FP(BKZ_base, 0.99, dimension);
-    for (int i = 0; i < v.length(); i++)
-    {
-        cout << v[i] << " ";
-    }
+    // BKZ_FP(BKZ_base, 0.99, dimension);
+    cout << "最終出力結果" << endl;
+    cout << v << endl;
     return 0;
 }
 NTL_CLIENT
