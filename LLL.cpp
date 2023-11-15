@@ -16,7 +16,7 @@
 #include <NTL/LLL.h> // LLLを使うためのライブラリ
 using namespace std;
 using namespace NTL;
-#define dimension 4
+#define dimension 3
 
 int main()
 {

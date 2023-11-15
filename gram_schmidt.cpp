@@ -91,11 +91,13 @@ int main()
       col++;
    }
 
-   transpose(base, base);
+   // transpose(base, base);
 
-   // // 基底行列の確認
-   // for(int i=0;i<dimension;i++){
-   //    for(int j=0;j<dimension;j++){
+   // 基底行列の確認
+   // for (int i = 0; i < dimension; i++)
+   // {
+   //    for (int j = 0; j < dimension; j++)
+   //    {
    //       cout << base[i][j] << "\t";
    //    }
    //    cout << "" << endl;
@@ -104,16 +106,20 @@ int main()
    GramSchmidt(base, GSO_matrix, GSO_mu_matrix);
 
    // cout << "グラムシュミット行列" << endl;
-   // for(int i=0;i<dimension;i++){
-   //    for(int j=0;j<dimension;j++){
-   //       cout << GSO_matrix[i][j]<< "\t";
+   // for (int i = 0; i < dimension; i++)
+   // {
+   //    for (int j = 0; j < dimension; j++)
+   //    {
+   //       cout << GSO_matrix[i][j] << "\t";
    //    }
    //    cout << "" << endl;
    // }
    // cout << "グラムシュミット係数行列" << endl;
-   // for(int i=0;i<dimension;i++){
-   //    for(int j=0;j<dimension;j++){
-   //       cout << GSO_mu_matrix[i][j]<< "\t";
+   // for (int i = 0; i < dimension; i++)
+   // {
+   //    for (int j = 0; j < dimension; j++)
+   //    {
+   //       cout << GSO_mu_matrix[i][j] << "\t";
    //    }
    //    cout << "" << endl;
    // }
