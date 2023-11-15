@@ -321,6 +321,26 @@ int main()
     // BKZ_FP(BKZ_base, 0.99, dimension);
     cout << "最終出力結果" << endl;
     cout << v << endl;
+    cout << "----------------------------------" << endl;
+    cout << "最終出力結果によるSVP" << endl;
+    vec_RR myself_SVP;
+    myself_SVP.SetLength(dimension);
+    clear(myself_SVP);
+    for (int i = 0; i < dimension; i++)
+    {
+        for (int j = 0; j < dimension; j++)
+        {
+            // cout << myself_SVP[i] << " + " << v[j] << " * " << base[j][i] << endl;
+            myself_SVP[i] += v[j] * base[j][i];
+        }
+        // cout << "---" << endl;
+    }
+    cout << myself_SVP << endl;
+
+    cout << "ライブラリによる出力" << endl;
+    mat_ZZ lib_SVP = conv<mat_ZZ>(base);
+    LLL_FP(lib_SVP);
+    cout << lib_SVP[0] << endl;
     return 0;
 }
 NTL_CLIENT
